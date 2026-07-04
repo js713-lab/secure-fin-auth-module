@@ -4,6 +4,7 @@
  */
 const prisma = require('../db/database');
 const { getPublicProfile } = require('../services/authService');
+const { recordAudit, listAuditLogs } = require('../services/auditService');
 
 async function listUsers(_req, res, next) {
   try {
@@ -50,6 +51,13 @@ async function updateUserRole(req, res, next) {
       },
     });
 
+    await recordAudit({
+      userId: user.id,
+      actorId: req.user.id,
+      action: 'ROLE_UPDATED',
+      resource: `${user.email}:${req.validated.role}`,
+    });
+
     res.status(200).json({
       success: true,
       message: 'User role updated',
@@ -63,4 +71,28 @@ async function updateUserRole(req, res, next) {
   }
 }
 
-module.exports = { listUsers, updateUserRole };
+async function listAuditTrails(_req, res, next) {
+  try {
+    const logs = await listAuditLogs({ limit: 100 });
+    res.status(200).json({
+      success: true,
+      data: logs.map((entry) => ({
+        id: entry.id,
+        action: entry.action,
+        resource: entry.resource,
+        outcome: entry.outcome,
+        createdAt: entry.createdAt,
+        user: entry.user
+          ? { username: entry.user.username, email: entry.user.email }
+          : null,
+        actor: entry.actor
+          ? { username: entry.actor.username, email: entry.actor.email }
+          : null,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { listUsers, updateUserRole, listAuditTrails };

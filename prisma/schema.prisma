@@ -13,13 +13,15 @@ model User {
   email               String   @unique
   passwordHash        String
   role                String   @default("CUSTOMER")
-  mfaEnabled          Boolean  @default(true)
+  mfaEnabled          Boolean  @default(false)
   failedLoginAttempts Int      @default(0)
   lockedUntil         DateTime?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
   otpSessions         OtpSession[]
   passwordResets      PasswordReset[]
+  auditLogs           AuditLog[]       @relation("AuditSubject")
+  auditActions        AuditLog[]       @relation("AuditActor")
 }
 
 model OtpSession {
@@ -58,4 +60,20 @@ model PasswordReset {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  actorId   String?
+  action    String
+  resource  String?
+  outcome   String   @default("SUCCESS")
+  createdAt DateTime @default(now())
+  user      User?    @relation("AuditSubject", fields: [userId], references: [id], onDelete: SetNull)
+  actor     User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([actorId])
+  @@index([createdAt])
 }

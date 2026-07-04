@@ -7,6 +7,7 @@ const { validateBody, updateRoleSchema } = require('../validators/authValidator'
 const router = express.Router();
 
 router.get('/users', authMiddleware, requireRole('ADMIN'), adminController.listUsers);
+router.get('/audit-trails', authMiddleware, requireRole('ADMIN'), adminController.listAuditTrails);
 router.patch(
   '/users/:userId/role',
   authMiddleware,
