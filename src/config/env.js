@@ -51,10 +51,22 @@ const env = {
     .map((o) => o.trim()),
 
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10),
-  rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
-  loginRateLimitMax: parseInt(process.env.LOGIN_RATE_LIMIT_MAX || '5', 10),
-  otpRateLimitMax: parseInt(process.env.OTP_RATE_LIMIT_MAX || '5', 10),
-  registerRateLimitMax: parseInt(process.env.REGISTER_RATE_LIMIT_MAX || '10', 10),
+  rateLimitMax: parseInt(
+    process.env.RATE_LIMIT_MAX || (process.env.NODE_ENV === 'production' ? '100' : '500'),
+    10
+  ),
+  loginRateLimitMax: parseInt(
+    process.env.LOGIN_RATE_LIMIT_MAX || (process.env.NODE_ENV === 'production' ? '5' : '30'),
+    10
+  ),
+  otpRateLimitMax: parseInt(
+    process.env.OTP_RATE_LIMIT_MAX || (process.env.NODE_ENV === 'production' ? '5' : '20'),
+    10
+  ),
+  registerRateLimitMax: parseInt(
+    process.env.REGISTER_RATE_LIMIT_MAX || (process.env.NODE_ENV === 'production' ? '10' : '30'),
+    10
+  ),
 };
 
 module.exports = env;

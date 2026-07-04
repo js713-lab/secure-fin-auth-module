@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const env = require('./config/env');
 const { globalLimiter } = require('./middleware/rateLimiter');
 const errorHandler = require('./middleware/errorHandler');
+const logger = require('./utils/logger');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
@@ -29,9 +30,6 @@ app.use(
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 
-// SECURITY: Global rate limit — baseline protection against automated abuse
-app.use(globalLimiter);
-
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/', (_req, res) => {
@@ -42,6 +40,18 @@ app.get('/health', (_req, res) => {
   res.json({ success: true, message: 'SecureFin Auth Module is running' });
 });
 
+app.post('/api/client-log', (req, res) => {
+  const { source, message, detail } = req.body || {};
+  logger.warn('Client-side error', {
+    source: String(source || 'client').slice(0, 80),
+    message: String(message || 'unknown').slice(0, 500),
+    detail: String(detail || '').slice(0, 1000),
+  });
+  res.status(204).end();
+});
+
+// SECURITY: Rate limit API routes only — static pages must not consume auth quotas.
+app.use('/api', globalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
