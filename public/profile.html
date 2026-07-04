@@ -13,133 +13,219 @@
         <strong>SECUREFIN<br />OS</strong>
       </div>
 
-      <div class="status-strip">
-        <div><strong>1</strong><span>Session</span></div>
-        <div><strong>2FA</strong><span>Mode</span></div>
-        <div><strong>0</strong><span>Alerts</span></div>
-      </div>
-
-      <nav class="side-nav" aria-label="Demo navigation">
-        <p>INTELLIGENCE</p>
-        <a href="/profile.html">Profile</a>
-        <a href="/health">Health Check</a>
-        <p>OPERATIONS</p>
-        <a href="#securityPanel">Audit Trails</a>
-        <a href="#adminPanel">User Management</a>
-        <p>SETTINGS</p>
-        <a href="#securityPanel">Security</a>
-        <a href="/login.html">Login Portal</a>
+      <nav class="side-nav" aria-label="Dashboard navigation">
+        <p>WORKSPACE</p>
+        <button type="button" class="side-link active" data-panel="profilePanel">Profile</button>
+        <button type="button" class="side-link" data-panel="auditPanel">Audit Trails</button>
+        <button type="button" class="side-link" data-panel="usersPanel">User Management</button>
+        <button type="button" class="side-link" data-panel="rolesPanel">Role Management</button>
       </nav>
-
-      <div class="demo-box">
-        <strong>DEMO MODE ACTIVE</strong>
-        <span>JWT is stored in an HttpOnly cookie after OTP verification.</span>
-        <button id="sidebarLogout" type="button">EXIT DEMO MODE</button>
-      </div>
     </aside>
 
     <main class="dashboard">
-      <header class="dashboard-topbar">
-        <div class="search-box">⌕ AI search</div>
-        <div class="topbar-actions">
-          <span>EN</span>
-          <span id="todayBadge">Today</span>
+      <header class="profile-header">
+        <div class="profile-header-main">
+          <div id="headerAvatar" class="header-avatar">?</div>
+          <div>
+            <p class="eyebrow">SECURE SESSION</p>
+            <h1 id="headerTitle">Welcome back</h1>
+            <div class="header-meta">
+              <span id="headerEmail" class="header-chip">loading@securefin.test</span>
+              <span id="headerRole" class="header-chip role-chip">CUSTOMER</span>
+              <span id="headerMfa" class="header-chip mfa-chip">2FA OFF</span>
+            </div>
+          </div>
+        </div>
+        <div class="profile-header-actions">
+          <span id="todayBadge" class="header-date"></span>
+          <button id="logoutButton" type="button" class="ghost-button">Logout</button>
         </div>
       </header>
 
-      <section class="title-row">
-        <div>
-          <h1>User Profile</h1>
-          <p>Profile Security & Settings</p>
+      <p id="profileMessage" class="message page-message" role="status"></p>
+
+      <section id="profilePanel" class="dashboard-panel">
+        <div class="tabs" role="tablist" aria-label="Profile sections">
+          <button type="button" class="tab-button active" data-tab="personalTab">Personal Information</button>
+          <button type="button" class="tab-button" data-tab="securityTab">Security</button>
+          <button type="button" class="tab-button" data-tab="notificationsTab">Notification Settings</button>
         </div>
-        <button id="logoutButton" type="button" class="ghost-button">Logout</button>
-      </section>
 
-      <section class="profile-grid">
-        <article class="profile-hero-card">
-          <div class="avatar-card">♙</div>
-          <div class="profile-main">
-            <span class="eyebrow">USER PROFILE</span>
-            <h2 id="profileName">Loading...</h2>
-            <div class="chips">
-              <span id="profileEmail">email</span>
-              <span>GLOBAL OPS</span>
+        <div id="personalTab" class="tab-panel active">
+          <article class="panel-card">
+            <div class="section-heading">
+              <span>PROFILE</span>
+              <h2>Personal Information</h2>
+              <p>Account details loaded from your authenticated session.</p>
             </div>
-            <p id="profileMessage" class="message" role="status">Loading profile...</p>
-          </div>
-          <div class="role-card">
-            <span>ROLE</span>
-            <strong id="profileRole">-</strong>
-          </div>
-          <div class="role-card success-card">
-            <span>STATUS</span>
-            <strong id="profileStatus">ACTIVE</strong>
-          </div>
-        </article>
-
-        <article class="metadata-card">
-          <div class="card-title">
-            <span>ACCOUNT</span>
-            <h3>ACCOUNT METADATA</h3>
-          </div>
-          <div class="meta-row"><span>JOINED DATE</span><strong id="joinedDate">-</strong></div>
-          <div class="meta-row"><span>LAST LOGIN</span><strong id="lastLogin">Current session</strong></div>
-          <div class="meta-row"><span>SESSION STATUS</span><strong id="sessionStatus">ACTIVE</strong></div>
-        </article>
-      </section>
-
-      <section class="tabs" aria-label="Profile sections">
-        <button type="button">PERSONAL INFORMATION</button>
-        <button type="button" class="active">SECURITY</button>
-        <button type="button">NOTIFICATION SETTINGS</button>
-      </section>
-
-      <section id="securityPanel" class="panel-card">
-        <div class="section-heading">
-          <span>SECURITY</span>
-          <h2>ACCOUNT ACCESS</h2>
-        </div>
-        <div class="security-grid">
-          <article class="security-tile">
-            <div>
-              <h3>TWO-FACTOR AUTHENTICATION</h3>
-              <p>Secure your account with OTP verification.</p>
+            <div class="info-grid">
+              <div class="info-field">
+                <span>Username</span>
+                <strong id="personalUsername">-</strong>
+              </div>
+              <div class="info-field">
+                <span>Email</span>
+                <strong id="personalEmail">-</strong>
+              </div>
+              <div class="info-field">
+                <span>Role</span>
+                <strong id="personalRole">-</strong>
+              </div>
+              <div class="info-field">
+                <span>Member Since</span>
+                <strong id="personalJoined">-</strong>
+              </div>
+              <div class="info-field">
+                <span>Last Login</span>
+                <strong id="personalLastLogin">-</strong>
+              </div>
+              <div class="info-field">
+                <span>Session Status</span>
+                <strong id="personalSession">ACTIVE</strong>
+              </div>
             </div>
-            <button id="enableMfaButton" type="button">ENABLE 2FA</button>
-          </article>
-
-          <article class="security-tile">
-            <div>
-              <h3>SESSIONS MANAGEMENT</h3>
-              <p>Review active session and cookie-based JWT access.</p>
-            </div>
-            <button id="refreshProfile" type="button">MANAGE</button>
           </article>
         </div>
+
+        <div id="securityTab" class="tab-panel">
+          <article class="panel-card">
+            <div class="section-heading">
+              <span>SECURITY</span>
+              <h2>Two-Factor Authentication</h2>
+              <p>When enabled, every sign-in requires an email OTP after your password.</p>
+            </div>
+            <div class="security-grid">
+              <article class="security-tile">
+                <div>
+                  <h3>Email OTP (2FA)</h3>
+                  <p id="mfaStatusText">Checking MFA status...</p>
+                </div>
+                <button id="enableMfaButton" type="button">Enable 2FA</button>
+              </article>
+              <article class="security-tile">
+                <div>
+                  <h3>Session</h3>
+                  <p>Refresh profile data and confirm your active HttpOnly cookie session.</p>
+                </div>
+                <button id="refreshProfile" type="button" class="ghost-button">Refresh Session</button>
+              </article>
+            </div>
+          </article>
+        </div>
+
+        <div id="notificationsTab" class="tab-panel">
+          <article class="panel-card">
+            <div class="section-heading">
+              <span>NOTIFICATIONS</span>
+              <h2>Notification Settings</h2>
+              <p>Choose which security alerts you want to receive by email.</p>
+            </div>
+            <form id="notificationForm" class="notification-form">
+              <label class="toggle-row">
+                <input type="checkbox" name="loginAlerts" checked />
+                <span>
+                  <strong>Login alerts</strong>
+                  <small>Email me when a new sign-in completes on my account.</small>
+                </span>
+              </label>
+              <label class="toggle-row">
+                <input type="checkbox" name="securityAlerts" checked />
+                <span>
+                  <strong>Security alerts</strong>
+                  <small>Email me when password reset or MFA settings change.</small>
+                </span>
+              </label>
+              <label class="toggle-row">
+                <input type="checkbox" name="productUpdates" />
+                <span>
+                  <strong>Product updates</strong>
+                  <small>Occasional SecureFin platform announcements.</small>
+                </span>
+              </label>
+              <button type="submit" class="blue-button">Save Preferences</button>
+              <p id="notificationMessage" class="message" role="status"></p>
+            </form>
+          </article>
+        </div>
       </section>
 
-      <section id="adminPanel" class="panel-card">
-        <div class="section-heading">
-          <span>ADMINISTRATION</span>
-          <h2>ROLE-BASED ACCESS CONTROL</h2>
-          <p>CUSTOMER users receive 403. ADMIN users can view users and update roles.</p>
-        </div>
-        <button id="loadAdminUsers" type="button" class="blue-button">LOAD ADMIN USERS</button>
-        <p id="adminMessage" class="message" role="status"></p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Created</th>
-                <th>Role Management</th>
-              </tr>
-            </thead>
-            <tbody id="adminUsersBody"></tbody>
-          </table>
-        </div>
+      <section id="auditPanel" class="dashboard-panel hidden">
+        <article class="panel-card">
+          <div class="section-heading">
+            <span>AUDIT</span>
+            <h2>Audit Trails</h2>
+            <p id="auditDescription">Security events for your account.</p>
+          </div>
+          <button id="loadAuditTrails" type="button" class="blue-button">Refresh Audit Log</button>
+          <p id="auditMessage" class="message" role="status"></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Action</th>
+                  <th>Resource</th>
+                  <th>Outcome</th>
+                  <th class="admin-col hidden">User</th>
+                  <th class="admin-col hidden">Actor</th>
+                </tr>
+              </thead>
+              <tbody id="auditBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="usersPanel" class="dashboard-panel hidden">
+        <article class="panel-card">
+          <div class="section-heading">
+            <span>ADMIN</span>
+            <h2>User Management</h2>
+            <p>View registered users. ADMIN role required.</p>
+          </div>
+          <button id="loadUsers" type="button" class="blue-button">Load Users</button>
+          <p id="usersMessage" class="message" role="status"></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>2FA</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="usersBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="rolesPanel" class="dashboard-panel hidden">
+        <article class="panel-card">
+          <div class="section-heading">
+            <span>RBAC</span>
+            <h2>Role Management</h2>
+            <p>Update user roles. CUSTOMER users cannot access this panel.</p>
+          </div>
+          <button id="loadRoles" type="button" class="blue-button">Load Roles</button>
+          <p id="rolesMessage" class="message" role="status"></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Current Role</th>
+                  <th>Created</th>
+                  <th>Assign Role</th>
+                </tr>
+              </thead>
+              <tbody id="rolesBody"></tbody>
+            </table>
+          </div>
+        </article>
       </section>
     </main>
 

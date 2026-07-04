@@ -435,6 +435,8 @@ input::placeholder {
 .sidebar {
   position: sticky;
   top: 0;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   padding: 18px 14px;
   border-right: 1px solid #dbe3ef;
@@ -499,26 +501,31 @@ input::placeholder {
   letter-spacing: 0.2em;
 }
 
-.side-nav a {
+.side-nav a,
+.side-nav .side-link {
   display: block;
+  width: 100%;
   padding: 8px 6px;
+  border: 0;
   border-radius: 7px;
+  background: transparent;
   color: #475569;
   font-size: 0.77rem;
   font-weight: 800;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
 
-.side-nav a:hover {
+.side-nav a:hover,
+.side-nav .side-link:hover,
+.side-nav .side-link.active {
   background: #e8f0ff;
   color: var(--blue);
 }
 
 .demo-box {
-  position: absolute;
-  right: 12px;
-  bottom: 18px;
-  left: 12px;
+  margin-top: auto;
   padding: 12px;
   border: 1px solid #ead69f;
   border-radius: 8px;
@@ -551,6 +558,164 @@ input::placeholder {
 
 .dashboard {
   padding: 18px 22px 44px;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  border: 1px solid #d7dfec;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.profile-header-main {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.header-avatar {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 14px;
+  background: #071329;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 950;
+}
+
+.profile-header h1 {
+  margin: 4px 0 10px;
+  font-size: 1.55rem;
+  letter-spacing: -0.03em;
+}
+
+.header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.header-chip {
+  padding: 6px 10px;
+  border: 1px solid #d4ddea;
+  border-radius: 999px;
+  background: #fff;
+  color: #4b5f7a;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.role-chip {
+  color: var(--blue);
+  background: #edf4ff;
+}
+
+.mfa-chip.mfa-on {
+  color: var(--success);
+  background: #e7fbf1;
+  border-color: #b7efd3;
+}
+
+.mfa-chip.mfa-off {
+  color: #935f00;
+  background: #fff4d8;
+  border-color: #ffe2a1;
+}
+
+.profile-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.header-date {
+  padding: 10px 14px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.page-message {
+  margin: 0 0 16px;
+}
+
+.dashboard-panel.hidden,
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.info-field {
+  padding: 16px;
+  border: 1px solid #d8deea;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.info-field span {
+  display: block;
+  margin-bottom: 6px;
+  color: #8290a2;
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+}
+
+.info-field strong {
+  font-size: 0.92rem;
+}
+
+.notification-form {
+  display: grid;
+  gap: 12px;
+}
+
+.toggle-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid #d8deea;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.toggle-row strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.toggle-row small {
+  color: var(--muted);
+}
+
+.security-tile button.enabled {
+  background: var(--success);
+}
+
+.hidden {
+  display: none !important;
 }
 
 .dashboard-topbar,
@@ -737,7 +902,8 @@ input::placeholder {
   margin-bottom: 22px;
 }
 
-.tabs button {
+.tabs button,
+.tab-button {
   padding: 10px;
   border: 1px solid #d7dfec;
   border-radius: 4px;
@@ -748,7 +914,8 @@ input::placeholder {
   letter-spacing: 0.12em;
 }
 
-.tabs button.active {
+.tabs button.active,
+.tab-button.active {
   background: var(--blue);
   color: #fff;
 }
@@ -842,8 +1009,15 @@ th {
   .dashboard-body,
   .profile-grid,
   .profile-hero-card,
-  .security-grid {
+  .security-grid,
+  .info-grid,
+  .profile-header {
     grid-template-columns: 1fr;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .radar-panel {
