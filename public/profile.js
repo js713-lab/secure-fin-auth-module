@@ -65,7 +65,7 @@ function updateHeader(profile) {
   setText('headerTitle', `Welcome, ${profile.username}`);
   setText('headerEmail', profile.email);
   setText('headerRole', profile.role);
-  setText('headerMfa', profile.mfaEnabled ? '2FA ON' : '2FA OFF');
+  setText('headerMfa', profile.mfaEnabled ? `2FA ON (${formatMfaMethod(profile.mfaMethod, true)})` : '2FA OFF');
 
   const mfaChip = document.getElementById('headerMfa');
   mfaChip.classList.toggle('mfa-on', Boolean(profile.mfaEnabled));
@@ -89,20 +89,168 @@ function updatePersonalTab(profile) {
   setText('personalSession', `ACTIVE ${profile.role}`);
 }
 
+function formatMfaMethod(method, enabled = false) {
+  if (method === 'TOTP') return 'Authenticator';
+  if (method === 'EMAIL') return 'Email';
+  return enabled ? 'Email' : 'Off';
+}
+
 function updateMfaUi(profile) {
-  const button = document.getElementById('enableMfaButton');
-  const statusText = document.getElementById('mfaStatusText');
+  const setupPanel = document.getElementById('mfaSetupPanel');
+  const authenticatorPanel = document.getElementById('authenticatorSetupPanel');
+  const enabledPanel = document.getElementById('mfaEnabledPanel');
+  const activeMethod = document.getElementById('mfaActiveMethod');
+  const setupIntro = document.getElementById('mfaSetupIntro');
+  const enableButton = document.getElementById('startMfaSetup');
+  const disableButton = document.getElementById('disableMfa');
+  const selectedMethod = getSelectedMfaMethod();
+
+  authenticatorPanel.classList.add('hidden');
+  setupPanel.classList.remove('hidden');
 
   if (profile.mfaEnabled) {
-    statusText.textContent = 'Email OTP is required at every sign-in.';
-    button.textContent = '2FA Enabled';
-    button.disabled = true;
-    button.classList.add('enabled');
+    enabledPanel.classList.remove('hidden');
+    if (setupIntro) setupIntro.textContent = '2FA is on. You can switch method or disable it below.';
+    activeMethod.textContent =
+      profile.mfaMethod === 'TOTP' ? 'Microsoft Authenticator' : 'Email OTP';
+    disableButton.classList.remove('hidden');
+
+    document.querySelectorAll('input[name="mfaMethodChoice"]').forEach((input) => {
+      input.checked = input.value === (profile.mfaMethod || 'EMAIL');
+    });
+
+    if (selectedMethod === profile.mfaMethod) {
+      enableButton.textContent = '2FA Active';
+      enableButton.disabled = true;
+    } else {
+      enableButton.textContent =
+        selectedMethod === 'TOTP' ? 'Switch to Microsoft Authenticator' : 'Switch to Email OTP';
+      enableButton.disabled = false;
+    }
+    return;
+  }
+
+  enabledPanel.classList.add('hidden');
+  disableButton.classList.add('hidden');
+  enableButton.textContent = 'Enable 2FA';
+  enableButton.disabled = false;
+  if (setupIntro) {
+    setupIntro.textContent =
+      '2FA is off by default. Choose email OTP or Microsoft Authenticator when you are ready.';
+  }
+}
+
+document.querySelectorAll('input[name="mfaMethodChoice"]').forEach((input) => {
+  input.addEventListener('change', () => {
+    if (currentProfile) updateMfaUi(currentProfile);
+  });
+});
+
+function getSelectedMfaMethod() {
+  const selected = document.querySelector('input[name="mfaMethodChoice"]:checked');
+  return selected ? selected.value : 'EMAIL';
+}
+
+async function startMfaSetup() {
+  const method = getSelectedMfaMethod();
+
+  if (currentProfile?.mfaEnabled && method === currentProfile.mfaMethod) {
+    return;
+  }
+
+  if (currentProfile?.mfaEnabled && method !== currentProfile.mfaMethod) {
+    setMessage('mfaMessage', 'Switching 2FA method...', '');
+    try {
+      const { response, data } = await requestJson('/api/profile/mfa/disable', { method: 'POST' });
+      if (!response.ok) {
+        setMessage('mfaMessage', data.message || 'Unable to switch 2FA method', 'error');
+        return;
+      }
+      currentProfile = data.data;
+    } catch {
+      setMessage('mfaMessage', 'Unable to switch 2FA method. Check that the server is running.', 'error');
+      return;
+    }
+  }
+
+  setMessage('mfaMessage', method === 'EMAIL' ? 'Enabling email OTP...' : 'Preparing authenticator setup...', '');
+
+  try {
+    if (method === 'EMAIL') {
+      const { response, data } = await requestJson('/api/profile/mfa/email', { method: 'POST' });
+      if (!response.ok) {
+        setMessage('mfaMessage', data.message || 'Unable to enable email OTP', 'error');
+        return;
+      }
+
+      currentProfile = data.data;
+      updateHeader(currentProfile);
+      updateMfaUi(currentProfile);
+      setMessage('mfaMessage', 'Email OTP two-factor authentication enabled.', 'success');
+      loadAuditTrails();
+      return;
+    }
+
+    const { response, data } = await requestJson('/api/profile/mfa/authenticator/setup', { method: 'POST' });
+    if (!response.ok) {
+      setMessage('mfaMessage', data.message || 'Unable to start authenticator setup', 'error');
+      return;
+    }
+
+    document.getElementById('mfaSetupPanel').classList.add('hidden');
+    document.getElementById('mfaEnabledPanel').classList.add('hidden');
+    document.getElementById('authenticatorSetupPanel').classList.remove('hidden');
+    document.getElementById('authenticatorQr').src = data.data.qrCodeDataUrl;
+    document.getElementById('authenticatorSecret').textContent = data.data.manualSecret;
+    setMessage('mfaMessage', 'Scan the QR code, then verify with a 6-digit code.', 'success');
+  } catch {
+    setMessage('mfaMessage', 'Unable to configure 2FA. Check that the server is running.', 'error');
+  }
+}
+
+function cancelAuthenticatorSetup() {
+  document.getElementById('authenticatorSetupPanel').classList.add('hidden');
+  document.getElementById('authenticatorCode').value = '';
+  document.getElementById('authenticatorQr').removeAttribute('src');
+  document.getElementById('authenticatorSecret').textContent = '';
+  if (currentProfile) {
+    updateMfaUi(currentProfile);
   } else {
-    statusText.textContent = '2FA is off. Enable it to require email OTP after password.';
-    button.textContent = 'Enable 2FA';
-    button.disabled = false;
-    button.classList.remove('enabled');
+    document.getElementById('mfaSetupPanel').classList.remove('hidden');
+  }
+  setMessage('mfaMessage', '', '');
+}
+
+async function verifyAuthenticatorSetup() {
+  const code = document.getElementById('authenticatorCode').value.trim();
+  if (!/^\d{6}$/.test(code)) {
+    setMessage('mfaMessage', 'Enter a valid 6-digit authenticator code.', 'error');
+    return;
+  }
+
+  setMessage('mfaMessage', 'Verifying authenticator code...', '');
+
+  try {
+    const { response, data } = await requestJson('/api/profile/mfa/authenticator/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+
+    if (!response.ok) {
+      setMessage('mfaMessage', data.message || 'Unable to verify authenticator code', 'error');
+      return;
+    }
+
+    currentProfile = data.data;
+    document.getElementById('authenticatorSetupPanel').classList.add('hidden');
+    document.getElementById('authenticatorCode').value = '';
+    updateHeader(currentProfile);
+    updateMfaUi(currentProfile);
+    setMessage('mfaMessage', 'Microsoft Authenticator two-factor authentication enabled.', 'success');
+    loadAuditTrails();
+  } catch {
+    setMessage('mfaMessage', 'Unable to verify authenticator code. Check that the server is running.', 'error');
   }
 }
 
@@ -123,7 +271,7 @@ async function loadProfile() {
     updatePersonalTab(currentProfile);
     updateMfaUi(currentProfile);
     loadNotificationPrefs();
-    setMessage('profileMessage', 'Authenticated profile loaded.', 'success');
+    setMessage('profileMessage', '', '');
   } catch {
     setMessage('profileMessage', 'Unable to load profile. Check that the server is running.', 'error');
   }
@@ -227,7 +375,7 @@ function renderUsersTable(users, tableBody, includeRoleControls) {
       actionCell.append(select, button);
       row.appendChild(actionCell);
     } else {
-      [user.username, user.email, user.role, user.mfaEnabled ? 'Enabled' : 'Disabled', formatDate(user.createdAt)].forEach(
+      [user.username, user.email, user.role, user.mfaEnabled ? formatMfaMethod(user.mfaMethod) : 'Disabled', formatDate(user.createdAt)].forEach(
         (value) => {
           const cell = document.createElement('td');
           cell.textContent = value;
@@ -311,28 +459,23 @@ async function updateUserRole(userId, role) {
   }
 }
 
-async function enableMfa() {
-  if (currentProfile?.mfaEnabled) return;
-
-  setMessage('profileMessage', 'Enabling two-factor authentication...', '');
+async function disableMfaSetup() {
+  setMessage('mfaMessage', 'Disabling two-factor authentication...', '');
 
   try {
-    const { response, data } = await requestJson('/api/profile/mfa/enable', {
-      method: 'POST',
-    });
-
+    const { response, data } = await requestJson('/api/profile/mfa/disable', { method: 'POST' });
     if (!response.ok) {
-      setMessage('profileMessage', data.message || 'Unable to enable 2FA', 'error');
+      setMessage('mfaMessage', data.message || 'Unable to disable 2FA', 'error');
       return;
     }
 
     currentProfile = data.data;
     updateHeader(currentProfile);
     updateMfaUi(currentProfile);
-    setMessage('profileMessage', 'Two-factor authentication enabled. Next sign-in will require email OTP.', 'success');
+    setMessage('mfaMessage', '2FA disabled. Choose Email OTP or Microsoft Authenticator to enable again.', 'success');
     loadAuditTrails();
   } catch {
-    setMessage('profileMessage', 'Unable to enable 2FA. Check that the server is running.', 'error');
+    setMessage('mfaMessage', 'Unable to disable 2FA. Check that the server is running.', 'error');
   }
 }
 
@@ -361,11 +504,13 @@ document.querySelectorAll('.tab-button').forEach((button) => {
 });
 
 document.getElementById('notificationForm').addEventListener('submit', saveNotificationPrefs);
-document.getElementById('refreshProfile').addEventListener('click', loadProfile);
 document.getElementById('loadAuditTrails').addEventListener('click', loadAuditTrails);
 document.getElementById('loadUsers').addEventListener('click', loadUsersList);
 document.getElementById('loadRoles').addEventListener('click', loadRolesList);
-document.getElementById('enableMfaButton').addEventListener('click', enableMfa);
+document.getElementById('disableMfa').addEventListener('click', disableMfaSetup);
+document.getElementById('cancelAuthenticatorSetup').addEventListener('click', cancelAuthenticatorSetup);
+document.getElementById('startMfaSetup').addEventListener('click', startMfaSetup);
+document.getElementById('verifyAuthenticator').addEventListener('click', verifyAuthenticatorSetup);
 document.getElementById('logoutButton').addEventListener('click', logout);
 setText('todayBadge', new Date().toLocaleDateString());
 
