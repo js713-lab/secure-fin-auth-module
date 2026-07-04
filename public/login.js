@@ -14,6 +14,40 @@ function showView(viewId) {
   });
 }
 
+function evaluatePasswordStrength(password) {
+  const checks = [
+    { ok: password.length >= 8, label: '8+ characters' },
+    { ok: /[A-Z]/.test(password), label: 'uppercase letter' },
+    { ok: /[a-z]/.test(password), label: 'lowercase letter' },
+    { ok: /[0-9]/.test(password), label: 'number' },
+    { ok: /[^A-Za-z0-9]/.test(password), label: 'special character' },
+  ];
+  const passed = checks.filter((check) => check.ok).length;
+  const missing = checks.filter((check) => !check.ok).map((check) => check.label);
+  const label = passed <= 2 ? 'weak' : passed === 3 ? 'fair' : passed === 4 ? 'good' : 'strong';
+
+  return {
+    label,
+    isStrong: passed === checks.length,
+    message:
+      passed === checks.length
+        ? 'Strong password. Meets SecureFin policy.'
+        : `Missing: ${missing.join(', ')}.`,
+  };
+}
+
+function updatePasswordStrength(inputId, meterId) {
+  const password = document.getElementById(inputId).value;
+  const meter = document.getElementById(meterId);
+  const text = meter.querySelector('p');
+  const result = evaluatePasswordStrength(password);
+  meter.className = `password-strength ${password ? result.label : ''}`.trim();
+  text.textContent = password
+    ? `${result.label.toUpperCase()}: ${result.message}`
+    : 'Use 8+ chars with uppercase, lowercase, number, and special character.';
+  return result;
+}
+
 async function postJson(url, body) {
   const response = await fetch(url, {
     method: 'POST',
@@ -53,9 +87,22 @@ document.getElementById('backToLoginFromForgot').addEventListener('click', () =>
   showView('loginView');
 });
 
+document.getElementById('registerPassword').addEventListener('input', () => {
+  updatePasswordStrength('registerPassword', 'registerPasswordStrength');
+});
+
+document.getElementById('newPassword').addEventListener('input', () => {
+  updatePasswordStrength('newPassword', 'resetPasswordStrength');
+});
+
 document.getElementById('registerForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!event.target.reportValidity()) return;
+  const strength = updatePasswordStrength('registerPassword', 'registerPasswordStrength');
+  if (!strength.isStrong) {
+    setMessage('registerMessage', 'Password must meet the strong password policy.', 'error');
+    return;
+  }
   setMessage('registerMessage', 'Registering customer...', '');
 
   try {
@@ -138,6 +185,11 @@ document.getElementById('forgotPasswordForm').addEventListener('submit', async (
 document.getElementById('resetPasswordForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!event.target.reportValidity()) return;
+  const strength = updatePasswordStrength('newPassword', 'resetPasswordStrength');
+  if (!strength.isStrong) {
+    setMessage('resetPasswordMessage', 'New password must meet the strong password policy.', 'error');
+    return;
+  }
   setMessage('resetPasswordMessage', 'Resetting password...', '');
 
   try {

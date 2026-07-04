@@ -275,6 +275,59 @@ input::placeholder {
   color: #7b8798;
 }
 
+.password-strength {
+  margin-top: 10px;
+}
+
+.strength-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d8deea;
+}
+
+.strength-track span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: #dc2626;
+  transition:
+    width 160ms ease,
+    background-color 160ms ease;
+}
+
+.password-strength p {
+  margin: 8px 0 0;
+  color: #7b8496;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.password-strength.weak .strength-track span {
+  width: 25%;
+  background: #dc2626;
+}
+
+.password-strength.fair .strength-track span {
+  width: 50%;
+  background: #f59e0b;
+}
+
+.password-strength.good .strength-track span {
+  width: 75%;
+  background: #2563eb;
+}
+
+.password-strength.strong .strength-track span {
+  width: 100%;
+  background: #16a34a;
+}
+
+.password-strength.strong p {
+  color: #15803d;
+}
+
 .primary-wide,
 .secondary-wide,
 .blue-button,
