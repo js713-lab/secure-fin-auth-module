@@ -7,5 +7,6 @@ prisma/dev.db
 prisma/test.db
 coverage/
 logs/
+public/vendor/ogl/
 *.log
 .DS_Store

@@ -1,3 +1,215 @@
+const STORAGE_THEME = 'securefin-theme';
+const STORAGE_LANG = 'securefin-lang';
+
+const translations = {
+  en: {
+    'login.eyebrow': 'CUSTOMER PORTAL',
+    'login.title': 'WELCOME BACK',
+    'login.subtitle': 'Sign in to your account',
+    'login.email': 'EMAIL',
+    'login.password': 'PASSWORD',
+    'login.forgot': 'FORGOT PASSWORD?',
+    'login.placeholderEmail': 'Enter your email address',
+    'login.placeholderPassword': 'Enter your password',
+    'login.signIn': 'SIGN IN',
+    'login.noAccount': "DON'T HAVE AN ACCOUNT?",
+    'login.createDemo': 'Create demo customer',
+    'register.hasAccount': 'ALREADY HAVE AN ACCOUNT?',
+    'register.eyebrow': 'NEW CUSTOMER',
+    'register.title': 'CREATE ACCOUNT',
+    'register.subtitle': 'Register a demo CUSTOMER account',
+    'register.username': 'USERNAME',
+    'register.email': 'EMAIL',
+    'register.password': 'PASSWORD',
+    'register.placeholderUsername': 'Choose a username',
+    'register.placeholderEmail': 'Enter your email address',
+    'register.placeholderPassword': 'Example: Secure@12345',
+    'register.passwordHint': 'Use 8+ chars with uppercase, lowercase, number, and special character.',
+    'register.create': 'CREATE CUSTOMER',
+    'regOtp.eyebrow': 'EMAIL VERIFICATION',
+    'regOtp.title': 'VERIFY REGISTER',
+    'regOtp.subtitle': 'Enter the OTP sent to your registration email.',
+    'regOtp.otp': 'OTP CODE',
+    'regOtp.placeholderOtp': 'Enter 6-digit OTP',
+    'regOtp.verify': 'VERIFY REGISTRATION',
+    'otp.eyebrow': 'MFA REQUIRED',
+    'otp.title': 'VERIFY OTP',
+    'otp.subtitleEmail': 'Enter the OTP sent to your email.',
+    'otp.subtitleTotp': 'Enter the 6-digit code from Microsoft Authenticator.',
+    'otp.verify': 'VERIFY OTP',
+    'otp.wrongAccount': 'WRONG ACCOUNT?',
+    'forgot.eyebrow': 'ACCOUNT RECOVERY',
+    'forgot.title': 'RESET PASSWORD',
+    'forgot.subtitle': 'We will email a reset OTP if the account exists.',
+    'forgot.send': 'SEND RESET OTP',
+    'forgot.resetId': 'RESET ID',
+    'forgot.placeholderResetId': 'Paste reset ID from email',
+    'forgot.newPassword': 'NEW PASSWORD',
+    'forgot.reset': 'RESET PASSWORD',
+    'forgot.remembered': 'REMEMBERED YOUR PASSWORD?',
+    'common.backToSignIn': 'Back to sign in',
+    'common.show': 'SHOW',
+    'common.hide': 'HIDE',
+    'strength.weak': 'WEAK',
+    'strength.fair': 'FAIR',
+    'strength.good': 'GOOD',
+    'strength.strong': 'STRONG',
+    'strength.strongOk': 'Strong password. Meets SecureFin policy.',
+    'strength.missing': 'Missing',
+  },
+  bm: {
+    'login.eyebrow': 'PORTAL PELANGGAN',
+    'login.title': 'SELAMAT KEMBALI',
+    'login.subtitle': 'Log masuk ke akaun anda',
+    'login.email': 'E-MEL',
+    'login.password': 'KATA LALUAN',
+    'login.forgot': 'LUPA KATA LALUAN?',
+    'login.placeholderEmail': 'Masukkan alamat e-mel anda',
+    'login.placeholderPassword': 'Masukkan kata laluan anda',
+    'login.signIn': 'LOG MASUK',
+    'login.noAccount': 'BELUM MEMPUNYAI AKAUN?',
+    'login.createDemo': 'Cipta akaun demo pelanggan',
+    'register.hasAccount': 'SUDAH MEMPUNYAI AKAUN?',
+    'register.eyebrow': 'PELANGGAN BARU',
+    'register.title': 'CIPTA AKAUN',
+    'register.subtitle': 'Daftar akaun demo PELANGGAN',
+    'register.username': 'NAMA PENGGUNA',
+    'register.email': 'E-MEL',
+    'register.password': 'KATA LALUAN',
+    'register.placeholderUsername': 'Pilih nama pengguna',
+    'register.placeholderEmail': 'Masukkan alamat e-mel anda',
+    'register.placeholderPassword': 'Contoh: Secure@12345',
+    'register.passwordHint': 'Gunakan 8+ aksara dengan huruf besar, huruf kecil, nombor, dan aksara khas.',
+    'register.create': 'CIPTA PELANGGAN',
+    'regOtp.eyebrow': 'PENGESAHAN E-MEL',
+    'regOtp.title': 'SAHKAN PENDAFTARAN',
+    'regOtp.subtitle': 'Masukkan OTP yang dihantar ke e-mel pendaftaran anda.',
+    'regOtp.otp': 'KOD OTP',
+    'regOtp.placeholderOtp': 'Masukkan OTP 6 digit',
+    'regOtp.verify': 'SAHKAN PENDAFTARAN',
+    'otp.eyebrow': 'MFA DIPERLUKAN',
+    'otp.title': 'SAHKAN OTP',
+    'otp.subtitleEmail': 'Masukkan OTP yang dihantar ke e-mel anda.',
+    'otp.subtitleTotp': 'Masukkan kod 6 digit daripada Microsoft Authenticator.',
+    'otp.verify': 'SAHKAN OTP',
+    'otp.wrongAccount': 'AKAUN SALAH?',
+    'forgot.eyebrow': 'PEMULIHAN AKAUN',
+    'forgot.title': 'SET SEMULA KATA LALUAN',
+    'forgot.subtitle': 'Kami akan e-mel OTP set semula jika akaun wujud.',
+    'forgot.send': 'HANTAR OTP SET SEMULA',
+    'forgot.resetId': 'ID SET SEMULA',
+    'forgot.placeholderResetId': 'Tampal ID set semula daripada e-mel',
+    'forgot.newPassword': 'KATA LALUAN BARU',
+    'forgot.reset': 'SET SEMULA KATA LALUAN',
+    'forgot.remembered': 'INGAT KATA LALUAN ANDA?',
+    'common.backToSignIn': 'Kembali ke log masuk',
+    'common.show': 'TUNJUK',
+    'common.hide': 'SEMBUNYI',
+    'strength.weak': 'LEMAH',
+    'strength.fair': 'SIHAT',
+    'strength.good': 'BAIK',
+    'strength.strong': 'KUAT',
+    'strength.strongOk': 'Kata laluan kuat. Memenuhi polisi SecureFin.',
+    'strength.missing': 'Tiada',
+  },
+};
+
+let currentLang = 'en';
+let currentTheme = 'light';
+let currentOtpMethod = 'EMAIL';
+
+function readPreference(key, fallback) {
+  try {
+    return localStorage.getItem(key) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function savePreference(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage errors in restricted contexts.
+  }
+}
+
+function t(key) {
+  return translations[currentLang]?.[key] || translations.en[key] || key;
+}
+
+function applyTheme(theme) {
+  currentTheme = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = currentTheme === 'dark' ? 'dark' : '';
+  savePreference(STORAGE_THEME, currentTheme);
+
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.textContent = currentTheme === 'dark' ? 'DARK' : 'LIGHT';
+    themeToggle.setAttribute(
+      'aria-label',
+      currentTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
+    );
+  }
+}
+
+function applyLanguage(lang) {
+  currentLang = lang === 'bm' ? 'bm' : 'en';
+  document.documentElement.lang = currentLang === 'bm' ? 'ms' : 'en';
+  savePreference(STORAGE_LANG, currentLang);
+
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.dataset.i18n;
+    if (key) el.textContent = t(key);
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+
+  document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+    const input = document.getElementById(button.dataset.togglePassword);
+    if (!input) return;
+    button.textContent = input.type === 'password' ? t('common.show') : t('common.hide');
+  });
+
+  const langToggle = document.getElementById('langToggle');
+  if (langToggle) {
+    langToggle.textContent = currentLang === 'bm' ? 'BM' : 'EN';
+    langToggle.setAttribute(
+      'aria-label',
+      currentLang === 'bm' ? 'Switch to English' : 'Tukar ke Bahasa Malaysia'
+    );
+  }
+
+  updateOtpSubtitle(currentOtpMethod);
+  refreshPasswordStrength('registerPassword', 'registerPasswordStrength');
+  refreshPasswordStrength('newPassword', 'resetPasswordStrength');
+}
+
+function updateOtpSubtitle(mfaMethod) {
+  currentOtpMethod = mfaMethod === 'TOTP' ? 'TOTP' : 'EMAIL';
+  const el = document.getElementById('otpSubtitle');
+  if (!el) return;
+  el.textContent =
+    currentOtpMethod === 'TOTP' ? t('otp.subtitleTotp') : t('otp.subtitleEmail');
+}
+
+function initPreferences() {
+  applyTheme(readPreference(STORAGE_THEME, 'light'));
+  applyLanguage(readPreference(STORAGE_LANG, 'en'));
+
+  document.getElementById('themeToggle')?.addEventListener('click', () => {
+    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  });
+
+  document.getElementById('langToggle')?.addEventListener('click', () => {
+    applyLanguage(currentLang === 'bm' ? 'en' : 'bm');
+  });
+}
+
+initPreferences();
+
 function setMessage(elementId, text, type) {
   const element = document.getElementById(elementId);
   element.textContent = text;
@@ -31,9 +243,16 @@ function evaluatePasswordStrength(password) {
     isStrong: passed === checks.length,
     message:
       passed === checks.length
-        ? 'Strong password. Meets SecureFin policy.'
-        : `Missing: ${missing.join(', ')}.`,
+        ? t('strength.strongOk')
+        : `${t('strength.missing')}: ${missing.join(', ')}.`,
   };
+}
+
+function refreshPasswordStrength(inputId, meterId) {
+  const input = document.getElementById(inputId);
+  const meter = document.getElementById(meterId);
+  if (!input || !meter) return;
+  updatePasswordStrength(inputId, meterId);
 }
 
 function updatePasswordStrength(inputId, meterId) {
@@ -43,8 +262,8 @@ function updatePasswordStrength(inputId, meterId) {
   const result = evaluatePasswordStrength(password);
   meter.className = `password-strength ${password ? result.label : ''}`.trim();
   text.textContent = password
-    ? `${result.label.toUpperCase()}: ${result.message}`
-    : 'Use 8+ chars with uppercase, lowercase, number, and special character.';
+    ? `${t(`strength.${result.label}`)}: ${result.message}`
+    : t('register.passwordHint');
   return result;
 }
 
@@ -100,7 +319,7 @@ document.querySelectorAll('[data-toggle-password]').forEach((button) => {
     const input = document.getElementById(button.dataset.togglePassword);
     const isHidden = input.type === 'password';
     input.type = isHidden ? 'text' : 'password';
-    button.textContent = isHidden ? 'HIDE' : 'SHOW';
+    button.textContent = isHidden ? t('common.hide') : t('common.show');
   });
 });
 
@@ -165,15 +384,23 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
       return;
     }
 
+    const formData = readForm(event.target);
     if (data.data.authenticated) {
       setMessage('loginMessage', 'Signed in successfully. Redirecting...', 'success');
       window.location.href = '/profile.html';
       return;
     }
 
-    document.getElementById('sessionId').value = data.data.sessionId;
+    document.getElementById('loginOtpEmail').value = data.data.email || formData.email;
+    updateOtpSubtitle(data.data.mfaMethod);
     showView('otpView');
-    setMessage('otpMessage', 'OTP sent to your registered email.', 'success');
+    setMessage(
+      'otpMessage',
+      data.data.mfaMethod === 'TOTP'
+        ? 'Enter your authenticator code to continue.'
+        : 'OTP sent to your registered email.',
+      'success'
+    );
   } catch {
     setMessage('loginMessage', 'Unable to log in. Check that the server is running.', 'error');
   }

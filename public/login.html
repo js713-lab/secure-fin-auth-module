@@ -4,20 +4,43 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SecureFin OS Login</title>
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem('securefin-theme') === 'dark') {
+            document.documentElement.dataset.theme = 'dark';
+          }
+          if (localStorage.getItem('securefin-lang') === 'bm') {
+            document.documentElement.lang = 'ms';
+          }
+        } catch (_err) {
+          // Ignore storage errors in restricted contexts.
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body class="login-body">
     <main class="login-shell">
-      <section class="radar-panel" aria-label="SecureFin security radar illustration">
+      <section class="radar-panel" aria-label="SecureFin ferrofluid background">
         <div
-          id="dotField"
-          class="dot-field"
-          data-dot-radius="1.5"
-          data-dot-spacing="14"
-          data-bulge-strength="67"
-          data-glow-radius="160"
-          data-wave-amplitude="0"
-          data-sparkle="false"
+          id="ferrofluidPanel"
+          class="ferrofluid-panel"
+          data-ferrofluid
+          data-colors="#ffffff,#ffffff,#ffffff"
+          data-speed="0.5"
+          data-scale="1"
+          data-turbulence="1"
+          data-fluidity="0.1"
+          data-rim-width="0.2"
+          data-sharpness="3"
+          data-shimmer="1"
+          data-glow="2"
+          data-flow-direction="down"
+          data-opacity="1"
+          data-mouse-interaction="true"
+          data-mouse-strength="1"
+          data-mouse-radius="0.3"
           aria-hidden="true"
         ></div>
         <div class="brand-mark">SF+</div>
@@ -30,234 +53,277 @@
 
       <section class="auth-panel">
         <div class="top-actions">
-          <span class="pill">LIGHT</span>
-          <span class="pill">EN</span>
+          <button id="themeToggle" type="button" class="pill pill-action" aria-label="Toggle color theme">
+            LIGHT
+          </button>
+          <button id="langToggle" type="button" class="pill pill-action" aria-label="Toggle language">
+            EN
+          </button>
         </div>
 
         <div class="auth-card">
           <section id="loginView" class="auth-view">
-            <p class="eyebrow">CUSTOMER PORTAL</p>
-            <h2>WELCOME BACK</h2>
-            <p class="subtitle">Sign in to your account</p>
+            <p class="eyebrow" data-i18n="login.eyebrow">CUSTOMER PORTAL</p>
+            <h2 data-i18n="login.title">WELCOME BACK</h2>
+            <p class="subtitle" data-i18n="login.subtitle">Sign in to your account</p>
 
             <form id="loginForm" novalidate>
-              <label for="identifier">EMAIL</label>
+              <label for="identifier" data-i18n="login.email">EMAIL</label>
               <div class="input-shell">
-                <span aria-hidden="true">✉</span>
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
                 <input
                   id="identifier"
                   name="email"
                   type="email"
                   autocomplete="username"
+                  data-i18n-placeholder="login.placeholderEmail"
                   placeholder="Enter your email address"
                   required
                 />
               </div>
 
               <div class="label-row">
-                <label for="loginPassword">PASSWORD</label>
-                <button id="showForgotPassword" type="button">FORGOT PASSWORD?</button>
+                <label for="loginPassword" data-i18n="login.password">PASSWORD</label>
+                <button id="showForgotPassword" type="button" data-i18n="login.forgot">FORGOT PASSWORD?</button>
               </div>
               <div class="input-shell">
-                <span aria-hidden="true">▣</span>
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </span>
                 <input
                   id="loginPassword"
                   name="password"
                   type="password"
                   autocomplete="current-password"
+                  data-i18n-placeholder="login.placeholderPassword"
                   placeholder="Enter your password"
                   required
                 />
-                <button class="password-toggle" type="button" data-toggle-password="loginPassword">
+                <button class="password-toggle" type="button" data-toggle-password="loginPassword" data-i18n="common.show">
                   SHOW
                 </button>
               </div>
 
-              <button class="primary-wide" type="submit">SIGN IN</button>
+              <button class="primary-wide" type="submit" data-i18n="login.signIn">SIGN IN</button>
               <p id="loginMessage" class="message" role="status"></p>
             </form>
 
             <div class="auth-switch">
-              <span>DON'T HAVE AN ACCOUNT?</span>
-              <button id="showRegister" type="button">Create demo customer</button>
+              <span data-i18n="login.noAccount">DON'T HAVE AN ACCOUNT?</span>
+              <button id="showRegister" type="button" data-i18n="login.createDemo">Create demo customer</button>
             </div>
           </section>
 
           <section id="registerView" class="auth-view hidden">
-            <p class="eyebrow">NEW CUSTOMER</p>
-            <h2>CREATE ACCOUNT</h2>
-            <p class="subtitle">Register a demo CUSTOMER account</p>
+            <p class="eyebrow" data-i18n="register.eyebrow">NEW CUSTOMER</p>
+            <h2 data-i18n="register.title">CREATE ACCOUNT</h2>
+            <p class="subtitle" data-i18n="register.subtitle">Register a demo CUSTOMER account</p>
 
             <form id="registerForm" novalidate>
-              <label for="registerUsername">USERNAME</label>
+              <label for="registerUsername" data-i18n="register.username">USERNAME</label>
               <div class="input-shell">
-                <span aria-hidden="true">◎</span>
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8" />
+                    <path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </span>
                 <input
                   id="registerUsername"
                   name="username"
                   autocomplete="username"
+                  data-i18n-placeholder="register.placeholderUsername"
                   placeholder="Choose a username"
                   required
                 />
               </div>
 
-              <label for="registerEmail">EMAIL</label>
+              <label for="registerEmail" data-i18n="register.email">EMAIL</label>
               <div class="input-shell">
-                <span aria-hidden="true">✉</span>
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
                 <input
                   id="registerEmail"
                   name="email"
                   type="email"
                   autocomplete="email"
+                  data-i18n-placeholder="register.placeholderEmail"
                   placeholder="Enter your email address"
                   required
                 />
               </div>
 
-              <label for="registerPassword">PASSWORD</label>
+              <label for="registerPassword" data-i18n="register.password">PASSWORD</label>
               <div class="input-shell">
-                <span aria-hidden="true">▣</span>
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </span>
                 <input
                   id="registerPassword"
                   name="password"
                   type="password"
                   autocomplete="new-password"
+                  data-i18n-placeholder="register.placeholderPassword"
                   placeholder="Example: Secure@12345"
                   required
                 />
-                <button class="password-toggle" type="button" data-toggle-password="registerPassword">
+                <button class="password-toggle" type="button" data-toggle-password="registerPassword" data-i18n="common.show">
                   SHOW
                 </button>
               </div>
               <div id="registerPasswordStrength" class="password-strength" aria-live="polite">
                 <div class="strength-track"><span></span></div>
-                <p>Use 8+ chars with uppercase, lowercase, number, and special character.</p>
+                <p data-i18n="register.passwordHint">Use 8+ chars with uppercase, lowercase, number, and special character.</p>
               </div>
 
-              <button class="primary-wide" type="submit">CREATE CUSTOMER</button>
+              <button class="primary-wide" type="submit" data-i18n="register.create">CREATE CUSTOMER</button>
               <p id="registerMessage" class="message" role="status"></p>
             </form>
 
             <div class="auth-switch">
-              <span>ALREADY HAVE AN ACCOUNT?</span>
-              <button id="showLogin" type="button">Back to sign in</button>
+              <span data-i18n="register.hasAccount">ALREADY HAVE AN ACCOUNT?</span>
+              <button id="showLogin" type="button" data-i18n="common.backToSignIn">Back to sign in</button>
             </div>
           </section>
 
           <section id="registrationOtpView" class="auth-view hidden">
-            <p class="eyebrow">EMAIL VERIFICATION</p>
-            <h2>VERIFY REGISTER</h2>
-            <p class="subtitle">Enter the OTP sent to your registration email.</p>
+            <p class="eyebrow" data-i18n="regOtp.eyebrow">EMAIL VERIFICATION</p>
+            <h2 data-i18n="regOtp.title">VERIFY REGISTER</h2>
+            <p class="subtitle" data-i18n="regOtp.subtitle">Enter the OTP sent to your registration email.</p>
 
             <form id="registrationOtpForm" novalidate>
-              <label for="registrationUsername">USERNAME</label>
+              <label for="registrationUsername" data-i18n="register.username">USERNAME</label>
               <input id="registrationUsername" name="username" readonly required />
 
-              <label for="registrationEmail">EMAIL</label>
+              <label for="registrationEmail" data-i18n="register.email">EMAIL</label>
               <input id="registrationEmail" name="email" type="email" readonly required />
 
-              <label for="registrationOtp">OTP CODE</label>
+              <label for="registrationOtp" data-i18n="regOtp.otp">OTP CODE</label>
               <input
                 id="registrationOtp"
                 name="otp"
                 inputmode="numeric"
                 maxlength="6"
+                data-i18n-placeholder="regOtp.placeholderOtp"
                 placeholder="Enter 6-digit OTP"
                 required
               />
 
-              <button class="primary-wide" type="submit">VERIFY REGISTRATION</button>
+              <button class="primary-wide" type="submit" data-i18n="regOtp.verify">VERIFY REGISTRATION</button>
               <p id="registrationOtpMessage" class="message" role="status"></p>
             </form>
           </section>
 
           <section id="otpView" class="auth-view hidden">
-            <p class="eyebrow">MFA REQUIRED</p>
-            <h2>VERIFY OTP</h2>
-            <p class="subtitle">Copy the prototype OTP from the server terminal.</p>
+            <p class="eyebrow" data-i18n="otp.eyebrow">MFA REQUIRED</p>
+            <h2 data-i18n="otp.title">VERIFY OTP</h2>
+            <p id="otpSubtitle" class="subtitle" data-i18n="otp.subtitleEmail">Enter the OTP sent to your email.</p>
 
             <form id="otpForm" novalidate>
-              <label for="sessionId">SESSION ID</label>
-              <input id="sessionId" name="sessionId" readonly required />
+              <label for="loginOtpEmail" data-i18n="login.email">EMAIL</label>
+              <input id="loginOtpEmail" name="email" type="email" readonly required />
 
-              <label for="otp">OTP CODE</label>
+              <label for="otp" data-i18n="regOtp.otp">OTP CODE</label>
               <input
                 id="otp"
                 name="otp"
                 inputmode="numeric"
                 maxlength="6"
+                data-i18n-placeholder="regOtp.placeholderOtp"
                 placeholder="Enter 6-digit OTP"
                 required
               />
 
-              <button class="primary-wide" type="submit">VERIFY OTP</button>
+              <button class="primary-wide" type="submit" data-i18n="otp.verify">VERIFY OTP</button>
               <p id="otpMessage" class="message" role="status"></p>
             </form>
 
             <div class="auth-switch">
-              <span>WRONG ACCOUNT?</span>
-              <button id="backToLoginFromOtp" type="button">Back to sign in</button>
+              <span data-i18n="otp.wrongAccount">WRONG ACCOUNT?</span>
+              <button id="backToLoginFromOtp" type="button" data-i18n="common.backToSignIn">Back to sign in</button>
             </div>
           </section>
 
           <section id="forgotPasswordView" class="auth-view hidden">
-            <p class="eyebrow">ACCOUNT RECOVERY</p>
-            <h2>RESET PASSWORD</h2>
-            <p class="subtitle">We will email a reset OTP if the account exists.</p>
+            <p class="eyebrow" data-i18n="forgot.eyebrow">ACCOUNT RECOVERY</p>
+            <h2 data-i18n="forgot.title">RESET PASSWORD</h2>
+            <p class="subtitle" data-i18n="forgot.subtitle">We will email a reset OTP if the account exists.</p>
 
             <form id="forgotPasswordForm" novalidate>
-              <label for="forgotEmail">EMAIL</label>
+              <label for="forgotEmail" data-i18n="login.email">EMAIL</label>
               <div class="input-shell">
-                <span aria-hidden="true">✉</span>
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
                 <input
                   id="forgotEmail"
                   name="email"
                   type="email"
+                  data-i18n-placeholder="login.placeholderEmail"
                   placeholder="Enter your email address"
                   required
                 />
               </div>
-              <button class="primary-wide" type="submit">SEND RESET OTP</button>
+              <button class="primary-wide" type="submit" data-i18n="forgot.send">SEND RESET OTP</button>
               <p id="forgotPasswordMessage" class="message" role="status"></p>
             </form>
 
             <form id="resetPasswordForm" class="reset-form hidden" novalidate>
-              <label for="resetId">RESET ID</label>
-              <input id="resetId" name="resetId" placeholder="Paste reset ID from email" required />
+              <label for="resetId" data-i18n="forgot.resetId">RESET ID</label>
+              <input id="resetId" name="resetId" data-i18n-placeholder="forgot.placeholderResetId" placeholder="Paste reset ID from email" required />
 
-              <label for="resetOtp">OTP CODE</label>
+              <label for="resetOtp" data-i18n="regOtp.otp">OTP CODE</label>
               <input id="resetOtp" name="otp" inputmode="numeric" maxlength="6" required />
 
-              <label for="newPassword">NEW PASSWORD</label>
+              <label for="newPassword" data-i18n="forgot.newPassword">NEW PASSWORD</label>
               <input
                 id="newPassword"
                 name="password"
                 type="password"
+                data-i18n-placeholder="register.placeholderPassword"
                 placeholder="Example: Secure@12345"
                 required
               />
-              <button class="password-toggle standalone-toggle" type="button" data-toggle-password="newPassword">
+              <button class="password-toggle standalone-toggle" type="button" data-toggle-password="newPassword" data-i18n="common.show">
                 SHOW
               </button>
               <div id="resetPasswordStrength" class="password-strength" aria-live="polite">
                 <div class="strength-track"><span></span></div>
-                <p>Use 8+ chars with uppercase, lowercase, number, and special character.</p>
+                <p data-i18n="register.passwordHint">Use 8+ chars with uppercase, lowercase, number, and special character.</p>
               </div>
 
-              <button class="primary-wide" type="submit">RESET PASSWORD</button>
+              <button class="primary-wide" type="submit" data-i18n="forgot.reset">RESET PASSWORD</button>
               <p id="resetPasswordMessage" class="message" role="status"></p>
             </form>
 
             <div class="auth-switch">
-              <span>REMEMBERED YOUR PASSWORD?</span>
-              <button id="backToLoginFromForgot" type="button">Back to sign in</button>
+              <span data-i18n="forgot.remembered">REMEMBERED YOUR PASSWORD?</span>
+              <button id="backToLoginFromForgot" type="button" data-i18n="common.backToSignIn">Back to sign in</button>
             </div>
           </section>
         </div>
       </section>
     </main>
 
-    <script src="/dotfield.js"></script>
+    <script type="module" src="/ferrofluid.js"></script>
     <script src="/login.js"></script>
   </body>
 </html>
