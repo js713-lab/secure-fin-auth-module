@@ -275,6 +275,22 @@ input::placeholder {
   color: #7b8798;
 }
 
+.password-toggle {
+  min-width: 58px;
+  margin-right: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--blue);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.standalone-toggle {
+  margin: 8px 0 0;
+  padding: 0;
+}
+
 .password-strength {
   margin-top: 10px;
 }

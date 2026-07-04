@@ -56,7 +56,7 @@
 
               <div class="label-row">
                 <label for="loginPassword">PASSWORD</label>
-              <button id="showForgotPassword" type="button">FORGOT PASSWORD?</button>
+                <button id="showForgotPassword" type="button">FORGOT PASSWORD?</button>
               </div>
               <div class="input-shell">
                 <span aria-hidden="true">▣</span>
@@ -68,6 +68,9 @@
                   placeholder="Enter your password"
                   required
                 />
+                <button class="password-toggle" type="button" data-toggle-password="loginPassword">
+                  SHOW
+                </button>
               </div>
 
               <button class="primary-wide" type="submit">SIGN IN</button>
@@ -122,6 +125,9 @@
                   placeholder="Example: Secure@12345"
                   required
                 />
+                <button class="password-toggle" type="button" data-toggle-password="registerPassword">
+                  SHOW
+                </button>
               </div>
               <div id="registerPasswordStrength" class="password-strength" aria-live="polite">
                 <div class="strength-track"><span></span></div>
@@ -227,6 +233,9 @@
                 placeholder="Example: Secure@12345"
                 required
               />
+              <button class="password-toggle standalone-toggle" type="button" data-toggle-password="newPassword">
+                SHOW
+              </button>
               <div id="resetPasswordStrength" class="password-strength" aria-live="polite">
                 <div class="strength-track"><span></span></div>
                 <p>Use 8+ chars with uppercase, lowercase, number, and special character.</p>

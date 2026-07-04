@@ -95,6 +95,15 @@ document.getElementById('newPassword').addEventListener('input', () => {
   updatePasswordStrength('newPassword', 'resetPasswordStrength');
 });
 
+document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const input = document.getElementById(button.dataset.togglePassword);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    button.textContent = isHidden ? 'HIDE' : 'SHOW';
+  });
+});
+
 document.getElementById('registerForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!event.target.reportValidity()) return;
@@ -157,7 +166,7 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
 
     document.getElementById('sessionId').value = data.data.sessionId;
     showView('otpView');
-    setMessage('otpMessage', 'OTP generated. Check the server terminal for the OTP.', 'success');
+    setMessage('otpMessage', 'OTP sent to your registered email.', 'success');
   } catch {
     setMessage('loginMessage', 'Unable to log in. Check that the server is running.', 'error');
   }
