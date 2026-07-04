@@ -9,6 +9,7 @@ const { createOtpSession, generateOtpCode, verifyOtp } = require('./otpService')
 const logger = require('../utils/logger');
 const jwt = require('../utils/jwt');
 const { sendRegistrationOtp, sendPasswordResetOtp } = require('./mailService');
+const { recordAudit } = require('./auditService');
 
 const GENERIC_AUTH_ERROR = 'Invalid credentials';
 
@@ -53,28 +54,33 @@ async function registerUser({ username, email, password }) {
   if (!env.isTest) {
     await sendRegistrationOtp({
       to: email,
+      username,
       otp,
-      registrationId: pending.id,
       expiresAt,
     });
   }
 
-  logger.info('Pending registration OTP sent', { pendingRegistrationId: pending.id, email });
+  logger.info('Pending registration OTP sent', { pendingRegistrationId: pending.id, email, username });
 
   return {
     success: true,
-    registrationId: pending.id,
+    username: pending.username,
+    email: pending.email,
     expiresAt,
     ...(env.isTest ? { otp } : {}),
   };
 }
 
-async function verifyRegistration({ registrationId, otp }) {
+async function verifyRegistration({ username, email, otp }) {
   const pending = await prisma.pendingRegistration.findUnique({
-    where: { id: registrationId },
+    where: { email },
   });
 
-  if (!pending || new Date() > pending.expiresAt) {
+  if (
+    !pending ||
+    pending.username !== username ||
+    new Date() > pending.expiresAt
+  ) {
     return { success: false, status: 401, message: 'Invalid or expired registration OTP' };
   }
 
@@ -98,7 +104,7 @@ async function verifyRegistration({ registrationId, otp }) {
       email: pending.email,
       passwordHash: pending.passwordHash,
       role: 'CUSTOMER',
-      mfaEnabled: true,
+      mfaEnabled: false,
     },
     select: {
       id: true,
@@ -112,6 +118,12 @@ async function verifyRegistration({ registrationId, otp }) {
 
   await prisma.pendingRegistration.delete({ where: { id: pending.id } });
   logger.info('User registered after email OTP verification', { userId: user.id, role: user.role });
+  await recordAudit({
+    userId: user.id,
+    actorId: user.id,
+    action: 'REGISTRATION_COMPLETED',
+    resource: user.email,
+  });
 
   return { success: true, user };
 }
@@ -160,11 +172,48 @@ async function loginStep1({ email, password }) {
   if (!passwordValid) {
     logger.warn('Failed login attempt', { userId: user.id });
     await lockUserIfNeeded(user);
+    await recordAudit({
+      userId: user.id,
+      actorId: user.id,
+      action: 'LOGIN_FAILED',
+      resource: email,
+      outcome: 'FAILURE',
+    });
     return { success: false, status: 401, message: GENERIC_AUTH_ERROR };
   }
 
   await resetFailedLoginState(user.id);
+
+  if (!user.mfaEnabled) {
+    const token = jwt.sign({ userId: user.id, role: user.role });
+    logger.info('User authenticated without MFA', { userId: user.id, role: user.role });
+    await recordAudit({
+      userId: user.id,
+      actorId: user.id,
+      action: 'LOGIN_SUCCESS',
+      resource: 'password-only',
+    });
+
+    return {
+      success: true,
+      authenticated: true,
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  }
+
   const otpSession = await createOtpSession(user.id);
+  await recordAudit({
+    userId: user.id,
+    actorId: user.id,
+    action: 'LOGIN_OTP_SENT',
+    resource: email,
+  });
 
   return {
     success: true,
@@ -188,6 +237,12 @@ async function loginStep2({ sessionId, otp }) {
   const token = jwt.sign({ userId: result.user.id, role: result.user.role });
 
   logger.info('User authenticated via OTP', { userId: result.user.id, role: result.user.role });
+  await recordAudit({
+    userId: result.user.id,
+    actorId: result.user.id,
+    action: 'LOGIN_SUCCESS',
+    resource: 'email-otp',
+  });
 
   return {
     success: true,

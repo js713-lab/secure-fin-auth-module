@@ -150,8 +150,11 @@
             <p class="subtitle">Enter the OTP sent to your registration email.</p>
 
             <form id="registrationOtpForm" novalidate>
-              <label for="registrationId">REGISTRATION ID</label>
-              <input id="registrationId" name="registrationId" readonly required />
+              <label for="registrationUsername">USERNAME</label>
+              <input id="registrationUsername" name="username" readonly required />
+
+              <label for="registrationEmail">EMAIL</label>
+              <input id="registrationEmail" name="email" type="email" readonly required />
 
               <label for="registrationOtp">OTP CODE</label>
               <input

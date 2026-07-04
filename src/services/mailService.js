@@ -42,14 +42,15 @@ async function sendMail({ to, subject, text }) {
   logger.info('Security email sent', { to, subject });
 }
 
-async function sendRegistrationOtp({ to, otp, registrationId, expiresAt }) {
+async function sendRegistrationOtp({ to, username, otp, expiresAt }) {
   await sendMail({
     to,
     subject: 'SecureFin Registration OTP',
     text: [
       'SecureFin account registration verification',
       '',
-      `Registration ID: ${registrationId}`,
+      `Username: ${username}`,
+      `Email: ${to}`,
       `OTP: ${otp}`,
       `Expires: ${expiresAt.toISOString()}`,
       '',

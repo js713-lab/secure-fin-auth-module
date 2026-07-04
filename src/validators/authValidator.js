@@ -40,7 +40,8 @@ const loginSchema = z.object({
 });
 
 const verifyRegistrationSchema = z.object({
-  registrationId: z.string().uuid('Invalid registration ID'),
+  username: usernameSchema,
+  email: emailSchema,
   otp: z
     .string()
     .trim()

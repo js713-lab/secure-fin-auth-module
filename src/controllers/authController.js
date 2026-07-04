@@ -47,7 +47,8 @@ async function register(req, res, next) {
       success: true,
       message: 'Registration OTP sent to email',
       data: {
-        registrationId: result.registrationId,
+        username: result.username,
+        email: result.email,
         expiresAt: result.expiresAt,
         ...(env.isTest && result.otp ? { otp: result.otp } : {}),
       },
@@ -89,10 +90,25 @@ async function login(req, res, next) {
       });
     }
 
+    if (result.authenticated) {
+      setAuthCookie(res, result.token);
+      return res.status(200).json({
+        success: true,
+        message: 'Authentication successful',
+        data: {
+          authenticated: true,
+          mfaRequired: false,
+          user: result.user,
+        },
+      });
+    }
+
     const response = {
       success: true,
       message: 'OTP sent to registered email.',
       data: {
+        authenticated: false,
+        mfaRequired: true,
         sessionId: result.sessionId,
         expiresAt: result.expiresAt,
       },
@@ -169,7 +185,17 @@ async function verifyOtpHandler(req, res, next) {
   }
 }
 
-function logout(_req, res) {
+const { recordAudit } = require('../services/auditService');
+
+function logout(req, res) {
+  if (req.user) {
+    recordAudit({
+      userId: req.user.id,
+      actorId: req.user.id,
+      action: 'LOGOUT',
+      resource: req.user.email,
+    });
+  }
   clearAuthCookie(res);
   res.status(200).json({
     success: true,

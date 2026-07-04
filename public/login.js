@@ -122,7 +122,8 @@ document.getElementById('registerForm').addEventListener('submit', async (event)
       return;
     }
 
-    document.getElementById('registrationId').value = data.data.registrationId;
+    document.getElementById('registrationUsername').value = data.data.username;
+    document.getElementById('registrationEmail').value = data.data.email;
     document.getElementById('identifier').value = formData.email;
     event.target.reset();
     showView('registrationOtpView');
@@ -161,6 +162,12 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
     const { response, data } = await postJson('/api/auth/login', readForm(event.target));
     if (!response.ok) {
       setMessage('loginMessage', data.message || 'Login failed', 'error');
+      return;
+    }
+
+    if (data.data.authenticated) {
+      setMessage('loginMessage', 'Signed in successfully. Redirecting...', 'success');
+      window.location.href = '/profile.html';
       return;
     }
 
