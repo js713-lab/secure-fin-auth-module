@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SecureFin Profile</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="dashboard-body">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <span class="brand-dot">SF</span>
+        <strong>SECUREFIN<br />OS</strong>
+      </div>
+
+      <div class="status-strip">
+        <div><strong>1</strong><span>Session</span></div>
+        <div><strong>2FA</strong><span>Mode</span></div>
+        <div><strong>0</strong><span>Alerts</span></div>
+      </div>
+
+      <nav class="side-nav" aria-label="Demo navigation">
+        <p>INTELLIGENCE</p>
+        <a href="/profile.html">Profile</a>
+        <a href="/health">Health Check</a>
+        <p>OPERATIONS</p>
+        <a href="#securityPanel">Audit Trails</a>
+        <a href="#adminPanel">User Management</a>
+        <p>SETTINGS</p>
+        <a href="#securityPanel">Security</a>
+        <a href="/login.html">Login Portal</a>
+      </nav>
+
+      <div class="demo-box">
+        <strong>DEMO MODE ACTIVE</strong>
+        <span>JWT is stored in an HttpOnly cookie after OTP verification.</span>
+        <button id="sidebarLogout" type="button">EXIT DEMO MODE</button>
+      </div>
+    </aside>
+
+    <main class="dashboard">
+      <header class="dashboard-topbar">
+        <div class="search-box">⌕ AI search</div>
+        <div class="topbar-actions">
+          <span>EN</span>
+          <span id="todayBadge">Today</span>
+        </div>
+      </header>
+
+      <section class="title-row">
+        <div>
+          <h1>User Profile</h1>
+          <p>Profile Security & Settings</p>
+        </div>
+        <button id="logoutButton" type="button" class="ghost-button">Logout</button>
+      </section>
+
+      <section class="profile-grid">
+        <article class="profile-hero-card">
+          <div class="avatar-card">♙</div>
+          <div class="profile-main">
+            <span class="eyebrow">USER PROFILE</span>
+            <h2 id="profileName">Loading...</h2>
+            <div class="chips">
+              <span id="profileEmail">email</span>
+              <span>GLOBAL OPS</span>
+            </div>
+            <p id="profileMessage" class="message" role="status">Loading profile...</p>
+          </div>
+          <div class="role-card">
+            <span>ROLE</span>
+            <strong id="profileRole">-</strong>
+          </div>
+          <div class="role-card success-card">
+            <span>STATUS</span>
+            <strong id="profileStatus">ACTIVE</strong>
+          </div>
+        </article>
+
+        <article class="metadata-card">
+          <div class="card-title">
+            <span>ACCOUNT</span>
+            <h3>ACCOUNT METADATA</h3>
+          </div>
+          <div class="meta-row"><span>JOINED DATE</span><strong id="joinedDate">-</strong></div>
+          <div class="meta-row"><span>LAST LOGIN</span><strong id="lastLogin">Current session</strong></div>
+          <div class="meta-row"><span>SESSION STATUS</span><strong id="sessionStatus">ACTIVE</strong></div>
+        </article>
+      </section>
+
+      <section class="tabs" aria-label="Profile sections">
+        <button type="button">PERSONAL INFORMATION</button>
+        <button type="button" class="active">SECURITY</button>
+        <button type="button">NOTIFICATION SETTINGS</button>
+      </section>
+
+      <section id="securityPanel" class="panel-card">
+        <div class="section-heading">
+          <span>SECURITY</span>
+          <h2>ACCOUNT ACCESS</h2>
+        </div>
+        <div class="security-grid">
+          <article class="security-tile">
+            <div>
+              <h3>TWO-FACTOR AUTHENTICATION</h3>
+              <p>Secure your account with OTP verification.</p>
+            </div>
+            <button id="enableMfaButton" type="button">ENABLE 2FA</button>
+          </article>
+
+          <article class="security-tile">
+            <div>
+              <h3>SESSIONS MANAGEMENT</h3>
+              <p>Review active session and cookie-based JWT access.</p>
+            </div>
+            <button id="refreshProfile" type="button">MANAGE</button>
+          </article>
+        </div>
+      </section>
+
+      <section id="adminPanel" class="panel-card">
+        <div class="section-heading">
+          <span>ADMINISTRATION</span>
+          <h2>ROLE-BASED ACCESS CONTROL</h2>
+          <p>CUSTOMER users receive 403. ADMIN users can view users and update roles.</p>
+        </div>
+        <button id="loadAdminUsers" type="button" class="blue-button">LOAD ADMIN USERS</button>
+        <p id="adminMessage" class="message" role="status"></p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created</th>
+                <th>Role Management</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/profile.js"></script>
+  </body>
+</html>

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SecureFin OS Login</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="login-body">
+    <main class="login-shell">
+      <section class="radar-panel" aria-label="SecureFin security radar illustration">
+        <div
+          id="dotField"
+          class="dot-field"
+          data-dot-radius="1.5"
+          data-dot-spacing="14"
+          data-bulge-strength="67"
+          data-glow-radius="160"
+          data-wave-amplitude="0"
+          data-sparkle="false"
+          aria-hidden="true"
+        ></div>
+        <div class="brand-mark">SF+</div>
+        <div class="radar-copy">
+          <h1>SECUREFIN OS</h1>
+          <p>Protecting customer access in real time.</p>
+        </div>
+        <small class="system-readout">SYSTEM-STATUS: MFA-READY<br />ENCRYPTION: AES/TLS READY</small>
+      </section>
+
+      <section class="auth-panel">
+        <div class="top-actions">
+          <span class="pill">LIGHT</span>
+          <span class="pill">EN</span>
+        </div>
+
+        <div class="auth-card">
+          <section id="loginView" class="auth-view">
+            <p class="eyebrow">CUSTOMER PORTAL</p>
+            <h2>WELCOME BACK</h2>
+            <p class="subtitle">Sign in to your account</p>
+
+            <form id="loginForm" novalidate>
+              <label for="identifier">EMAIL</label>
+              <div class="input-shell">
+                <span aria-hidden="true">✉</span>
+                <input
+                  id="identifier"
+                  name="email"
+                  type="email"
+                  autocomplete="username"
+                  placeholder="Enter your email address"
+                  required
+                />
+              </div>
+
+              <div class="label-row">
+                <label for="loginPassword">PASSWORD</label>
+              <button id="showForgotPassword" type="button">FORGOT PASSWORD?</button>
+              </div>
+              <div class="input-shell">
+                <span aria-hidden="true">▣</span>
+                <input
+                  id="loginPassword"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+
+              <button class="primary-wide" type="submit">SIGN IN</button>
+              <p id="loginMessage" class="message" role="status"></p>
+            </form>
+
+            <div class="auth-switch">
+              <span>DON'T HAVE AN ACCOUNT?</span>
+              <button id="showRegister" type="button">Create demo customer</button>
+            </div>
+          </section>
+
+          <section id="registerView" class="auth-view hidden">
+            <p class="eyebrow">NEW CUSTOMER</p>
+            <h2>CREATE ACCOUNT</h2>
+            <p class="subtitle">Register a demo CUSTOMER account</p>
+
+            <form id="registerForm" novalidate>
+              <label for="registerUsername">USERNAME</label>
+              <div class="input-shell">
+                <span aria-hidden="true">◎</span>
+                <input
+                  id="registerUsername"
+                  name="username"
+                  autocomplete="username"
+                  placeholder="Choose a username"
+                  required
+                />
+              </div>
+
+              <label for="registerEmail">EMAIL</label>
+              <div class="input-shell">
+                <span aria-hidden="true">✉</span>
+                <input
+                  id="registerEmail"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="Enter your email address"
+                  required
+                />
+              </div>
+
+              <label for="registerPassword">PASSWORD</label>
+              <div class="input-shell">
+                <span aria-hidden="true">▣</span>
+                <input
+                  id="registerPassword"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Example: Secure@12345"
+                  required
+                />
+              </div>
+
+              <button class="primary-wide" type="submit">CREATE CUSTOMER</button>
+              <p id="registerMessage" class="message" role="status"></p>
+            </form>
+
+            <div class="auth-switch">
+              <span>ALREADY HAVE AN ACCOUNT?</span>
+              <button id="showLogin" type="button">Back to sign in</button>
+            </div>
+          </section>
+
+          <section id="registrationOtpView" class="auth-view hidden">
+            <p class="eyebrow">EMAIL VERIFICATION</p>
+            <h2>VERIFY REGISTER</h2>
+            <p class="subtitle">Enter the OTP sent to your registration email.</p>
+
+            <form id="registrationOtpForm" novalidate>
+              <label for="registrationId">REGISTRATION ID</label>
+              <input id="registrationId" name="registrationId" readonly required />
+
+              <label for="registrationOtp">OTP CODE</label>
+              <input
+                id="registrationOtp"
+                name="otp"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="Enter 6-digit OTP"
+                required
+              />
+
+              <button class="primary-wide" type="submit">VERIFY REGISTRATION</button>
+              <p id="registrationOtpMessage" class="message" role="status"></p>
+            </form>
+          </section>
+
+          <section id="otpView" class="auth-view hidden">
+            <p class="eyebrow">MFA REQUIRED</p>
+            <h2>VERIFY OTP</h2>
+            <p class="subtitle">Copy the prototype OTP from the server terminal.</p>
+
+            <form id="otpForm" novalidate>
+              <label for="sessionId">SESSION ID</label>
+              <input id="sessionId" name="sessionId" readonly required />
+
+              <label for="otp">OTP CODE</label>
+              <input
+                id="otp"
+                name="otp"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="Enter 6-digit OTP"
+                required
+              />
+
+              <button class="primary-wide" type="submit">VERIFY OTP</button>
+              <p id="otpMessage" class="message" role="status"></p>
+            </form>
+
+            <div class="auth-switch">
+              <span>WRONG ACCOUNT?</span>
+              <button id="backToLoginFromOtp" type="button">Back to sign in</button>
+            </div>
+          </section>
+
+          <section id="forgotPasswordView" class="auth-view hidden">
+            <p class="eyebrow">ACCOUNT RECOVERY</p>
+            <h2>RESET PASSWORD</h2>
+            <p class="subtitle">We will email a reset OTP if the account exists.</p>
+
+            <form id="forgotPasswordForm" novalidate>
+              <label for="forgotEmail">EMAIL</label>
+              <div class="input-shell">
+                <span aria-hidden="true">✉</span>
+                <input
+                  id="forgotEmail"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  required
+                />
+              </div>
+              <button class="primary-wide" type="submit">SEND RESET OTP</button>
+              <p id="forgotPasswordMessage" class="message" role="status"></p>
+            </form>
+
+            <form id="resetPasswordForm" class="reset-form hidden" novalidate>
+              <label for="resetId">RESET ID</label>
+              <input id="resetId" name="resetId" placeholder="Paste reset ID from email" required />
+
+              <label for="resetOtp">OTP CODE</label>
+              <input id="resetOtp" name="otp" inputmode="numeric" maxlength="6" required />
+
+              <label for="newPassword">NEW PASSWORD</label>
+              <input
+                id="newPassword"
+                name="password"
+                type="password"
+                placeholder="Example: Secure@12345"
+                required
+              />
+
+              <button class="primary-wide" type="submit">RESET PASSWORD</button>
+              <p id="resetPasswordMessage" class="message" role="status"></p>
+            </form>
+
+            <div class="auth-switch">
+              <span>REMEMBERED YOUR PASSWORD?</span>
+              <button id="backToLoginFromForgot" type="button">Back to sign in</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="/dotfield.js"></script>
+    <script src="/login.js"></script>
+  </body>
+</html>
