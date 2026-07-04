@@ -1,5 +1,6 @@
 node_modules/
 .env
+REPORT_Q3_NOTES.md
 *.db
 *.db-journal
 prisma/dev.db
