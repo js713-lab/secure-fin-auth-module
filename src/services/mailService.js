@@ -59,14 +59,14 @@ async function sendRegistrationOtp({ to, username, otp, expiresAt }) {
   });
 }
 
-async function sendLoginOtp({ to, otp, sessionId, expiresAt }) {
+async function sendLoginOtp({ to, otp, expiresAt }) {
   await sendMail({
     to,
     subject: 'SecureFin Login OTP',
     text: [
       'SecureFin login verification',
       '',
-      `Session ID: ${sessionId}`,
+      `Email: ${to}`,
       `OTP: ${otp}`,
       `Expires: ${expiresAt.toISOString()}`,
       '',

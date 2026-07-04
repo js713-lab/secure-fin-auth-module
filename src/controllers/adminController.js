@@ -15,6 +15,7 @@ async function listUsers(_req, res, next) {
         email: true,
         role: true,
         mfaEnabled: true,
+        mfaMethod: true,
         createdAt: true,
       },
       orderBy: { createdAt: 'desc' },
@@ -47,6 +48,7 @@ async function updateUserRole(req, res, next) {
         email: true,
         role: true,
         mfaEnabled: true,
+        mfaMethod: true,
         createdAt: true,
       },
     });

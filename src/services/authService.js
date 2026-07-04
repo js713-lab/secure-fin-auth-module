@@ -5,11 +5,12 @@
 const bcrypt = require('bcrypt');
 const env = require('../config/env');
 const prisma = require('../db/database');
-const { createOtpSession, generateOtpCode, verifyOtp } = require('./otpService');
+const { createOtpSession, generateOtpCode, verifyOtpByEmail } = require('./otpService');
 const logger = require('../utils/logger');
 const jwt = require('../utils/jwt');
 const { sendRegistrationOtp, sendPasswordResetOtp } = require('./mailService');
 const { recordAudit } = require('./auditService');
+const { verifyTotpCode } = require('./totpService');
 
 const GENERIC_AUTH_ERROR = 'Invalid credentials';
 
@@ -112,6 +113,7 @@ async function verifyRegistration({ username, email, otp }) {
       email: true,
       role: true,
       mfaEnabled: true,
+      mfaMethod: true,
       createdAt: true,
     },
   });
@@ -207,6 +209,23 @@ async function loginStep1({ email, password }) {
     };
   }
 
+  const mfaMethod = user.mfaMethod || 'EMAIL';
+
+  if (mfaMethod === 'TOTP') {
+    await recordAudit({
+      userId: user.id,
+      actorId: user.id,
+      action: 'LOGIN_TOTP_REQUIRED',
+      resource: email,
+    });
+
+    return {
+      success: true,
+      email: user.email,
+      mfaMethod: 'TOTP',
+    };
+  }
+
   const otpSession = await createOtpSession(user.id);
   await recordAudit({
     userId: user.id,
@@ -217,41 +236,65 @@ async function loginStep1({ email, password }) {
 
   return {
     success: true,
-    sessionId: otpSession.sessionId,
+    email: user.email,
+    mfaMethod: 'EMAIL',
     expiresAt: otpSession.expiresAt,
     otp: otpSession.otp,
   };
 }
 
-async function loginStep2({ sessionId, otp }) {
-  const result = await verifyOtp(sessionId, otp);
+async function loginStep2({ email, otp }) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
 
-  if (!result.valid) {
-    const message =
-      result.reason === 'expired'
-        ? 'OTP has expired. Please log in again.'
-        : 'Invalid or expired OTP';
-    return { success: false, status: 401, message };
+  if (!user || !user.mfaEnabled) {
+    return { success: false, status: 401, message: 'Invalid or expired OTP' };
   }
 
-  const token = jwt.sign({ userId: result.user.id, role: result.user.role });
+  const mfaMethod = user.mfaMethod || 'EMAIL';
+  let authenticatedUser = user;
 
-  logger.info('User authenticated via OTP', { userId: result.user.id, role: result.user.role });
+  if (mfaMethod === 'TOTP') {
+    if (!verifyTotpCode(user.totpSecret, otp)) {
+      return { success: false, status: 401, message: 'Invalid or expired authenticator code' };
+    }
+  } else {
+    const result = await verifyOtpByEmail(email, otp);
+
+    if (!result.valid) {
+      const message =
+        result.reason === 'expired'
+          ? 'OTP has expired. Please log in again.'
+          : 'Invalid or expired OTP';
+      return { success: false, status: 401, message };
+    }
+
+    authenticatedUser = result.user;
+  }
+
+  const token = jwt.sign({ userId: authenticatedUser.id, role: authenticatedUser.role });
+
+  logger.info('User authenticated via MFA', {
+    userId: authenticatedUser.id,
+    role: authenticatedUser.role,
+    mfaMethod,
+  });
   await recordAudit({
-    userId: result.user.id,
-    actorId: result.user.id,
+    userId: authenticatedUser.id,
+    actorId: authenticatedUser.id,
     action: 'LOGIN_SUCCESS',
-    resource: 'email-otp',
+    resource: mfaMethod === 'TOTP' ? 'authenticator' : 'email-otp',
   });
 
   return {
     success: true,
     token,
     user: {
-      id: result.user.id,
-      username: result.user.username,
-      email: result.user.email,
-      role: result.user.role,
+      id: authenticatedUser.id,
+      username: authenticatedUser.username,
+      email: authenticatedUser.email,
+      role: authenticatedUser.role,
     },
   };
 }
@@ -330,12 +373,15 @@ async function completePasswordReset({ resetId, otp, password }) {
 }
 
 function getPublicProfile(user) {
+  const mfaMethod = user.mfaEnabled ? user.mfaMethod || 'EMAIL' : null;
+
   return {
     id: user.id,
     username: user.username,
     email: user.email,
     role: user.role,
     mfaEnabled: user.mfaEnabled,
+    mfaMethod,
     createdAt: user.createdAt,
   };
 }

@@ -14,6 +14,9 @@ model User {
   passwordHash        String
   role                String   @default("CUSTOMER")
   mfaEnabled          Boolean  @default(false)
+  mfaMethod           String?
+  totpSecret          String?
+  totpPendingSecret   String?
   failedLoginAttempts Int      @default(0)
   lockedUntil         DateTime?
   createdAt           DateTime @default(now())

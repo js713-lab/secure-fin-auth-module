@@ -49,7 +49,7 @@ const verifyRegistrationSchema = z.object({
 });
 
 const verifyOtpSchema = z.object({
-  sessionId: z.string().uuid('Invalid session ID'),
+  email: emailSchema,
   otp: z
     .string()
     .trim()
@@ -67,6 +67,13 @@ const resetPasswordSchema = z.object({
     .trim()
     .regex(/^\d{6}$/, 'OTP must be a 6-digit code'),
   password: passwordSchema,
+});
+
+const verifyAuthenticatorSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, 'Authenticator code must be a 6-digit code'),
 });
 
 const updateRoleSchema = z.object({
@@ -99,6 +106,7 @@ module.exports = {
   verifyOtpSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  verifyAuthenticatorSchema,
   updateRoleSchema,
   validateBody,
 };

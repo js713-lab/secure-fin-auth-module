@@ -103,13 +103,18 @@ async function login(req, res, next) {
       });
     }
 
+    const mfaMethod = result.mfaMethod || 'EMAIL';
     const response = {
       success: true,
-      message: 'OTP sent to registered email.',
+      message:
+        mfaMethod === 'TOTP'
+          ? 'Enter the code from Microsoft Authenticator.'
+          : 'OTP sent to registered email.',
       data: {
         authenticated: false,
         mfaRequired: true,
-        sessionId: result.sessionId,
+        email: result.email,
+        mfaMethod,
         expiresAt: result.expiresAt,
       },
     };

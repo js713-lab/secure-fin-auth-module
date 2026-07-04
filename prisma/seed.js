@@ -25,14 +25,14 @@ async function main() {
       username: ADMIN.username,
       passwordHash,
       role: ADMIN.role,
-      mfaEnabled: true,
+      mfaEnabled: false,
     },
     create: {
       username: ADMIN.username,
       email: ADMIN.email,
       passwordHash,
       role: ADMIN.role,
-      mfaEnabled: true,
+      mfaEnabled: false,
     },
     select: {
       id: true,

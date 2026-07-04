@@ -37,6 +37,7 @@ async function authMiddleware(req, res, next) {
         email: true,
         role: true,
         mfaEnabled: true,
+        mfaMethod: true,
         createdAt: true,
       },
     });

@@ -4,8 +4,12 @@
  */
 const { getPublicProfile } = require('../services/authService');
 const { recordAudit, listAuditLogs } = require('../services/auditService');
-const prisma = require('../db/database');
-const logger = require('../utils/logger');
+const {
+  enableEmailMfa,
+  startAuthenticatorSetup,
+  verifyAuthenticatorSetup,
+  disableMfa,
+} = require('../services/mfaService');
 
 async function getProfile(req, res, next) {
   try {
@@ -25,32 +29,86 @@ async function getProfile(req, res, next) {
   }
 }
 
-async function enableMfa(req, res, next) {
+async function enableEmailMfaHandler(req, res, next) {
   try {
-    const user = await prisma.user.update({
-      where: { id: req.user.id },
-      data: { mfaEnabled: true },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        role: true,
-        mfaEnabled: true,
-        createdAt: true,
-      },
-    });
+    if (req.user.mfaEnabled) {
+      return res.status(400).json({
+        success: false,
+        message: 'Two-factor authentication is already enabled',
+      });
+    }
 
-    logger.info('MFA enabled for user', { userId: user.id });
-    await recordAudit({
-      userId: user.id,
-      actorId: user.id,
-      action: 'MFA_ENABLED',
-      resource: user.email,
-    });
+    const user = await enableEmailMfa(req.user.id);
 
     res.status(200).json({
       success: true,
-      message: 'Two-factor authentication enabled',
+      message: 'Email OTP two-factor authentication enabled',
+      data: getPublicProfile(user),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function setupAuthenticatorHandler(req, res, next) {
+  try {
+    const result = await startAuthenticatorSetup(req.user.id);
+
+    if (!result.success) {
+      return res.status(result.status).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Scan the QR code in Microsoft Authenticator, then verify with a 6-digit code',
+      data: {
+        qrCodeDataUrl: result.qrCodeDataUrl,
+        manualSecret: result.manualSecret,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function verifyAuthenticatorHandler(req, res, next) {
+  try {
+    const result = await verifyAuthenticatorSetup(req.user.id, req.validated.code);
+
+    if (!result.success) {
+      return res.status(result.status).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Microsoft Authenticator two-factor authentication enabled',
+      data: getPublicProfile(result.user),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function disableMfaHandler(req, res, next) {
+  try {
+    if (!req.user.mfaEnabled) {
+      return res.status(400).json({
+        success: false,
+        message: 'Two-factor authentication is already disabled',
+      });
+    }
+
+    const user = await disableMfa(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Two-factor authentication disabled',
       data: getPublicProfile(user),
     });
   } catch (err) {
@@ -79,4 +137,11 @@ async function getAuditTrails(req, res, next) {
   }
 }
 
-module.exports = { getProfile, enableMfa, getAuditTrails };
+module.exports = {
+  getProfile,
+  enableEmailMfaHandler,
+  setupAuthenticatorHandler,
+  verifyAuthenticatorHandler,
+  disableMfaHandler,
+  getAuditTrails,
+};

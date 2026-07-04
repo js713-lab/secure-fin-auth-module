@@ -42,17 +42,51 @@ async function createOtpSession(userId) {
     await sendLoginOtp({
       to: user.email,
       otp,
-      sessionId: session.id,
       expiresAt,
     });
   }
 
   return {
-    sessionId: session.id,
+    email: user?.email,
     expiresAt,
-    // Return plain OTP only in test environment for automated tests
     ...(env.isTest ? { otp } : {}),
   };
+}
+
+async function verifyOtpByEmail(email, otp) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return { valid: false, reason: 'invalid' };
+  }
+
+  const session = await prisma.otpSession.findFirst({
+    where: {
+      userId: user.id,
+      used: false,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: 'desc' },
+    include: { user: true },
+  });
+
+  if (!session) {
+    return { valid: false, reason: 'invalid' };
+  }
+
+  const matches = await bcrypt.compare(otp, session.otpHash);
+  if (!matches) {
+    return { valid: false, reason: 'invalid' };
+  }
+
+  await prisma.otpSession.update({
+    where: { id: session.id },
+    data: { used: true },
+  });
+
+  return { valid: true, user: session.user };
 }
 
 async function verifyOtp(sessionId, otp) {
@@ -86,4 +120,5 @@ module.exports = {
   createOtpSession,
   generateOtpCode,
   verifyOtp,
+  verifyOtpByEmail,
 };
