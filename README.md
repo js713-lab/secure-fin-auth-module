@@ -453,3 +453,7 @@ securefin-auth-module/
 ## License
 
 MIT — Educational prototype for ITS69405 assignment.
+
+---
+
+Maintained by [CodeCrafter](https://www.codecrafter.dev/) · contact [hong@codecrafter.dev](mailto:hong@codecrafter.dev).
